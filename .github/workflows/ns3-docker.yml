@@ -24,7 +24,13 @@ jobs:
       - name: Get latest NS3 version
         id: get-version
         run: |
-          LATEST_VERSION=$(curl -s https://www.nsnam.org/releases/ | grep -oP 'ns-allinone-3\.\d+\.tar\.bz2' | sort -V | tail -n1 | grep -oP '3\.\d+')
+          LATEST_VERSION=$(curl -s https://www.nsnam.org/releases/ | 
+            grep -o '<a href="/releases/ns-3-[0-9]\+/"' |
+            grep -o '[0-9]\+' |
+            awk '{if (length($1) > 1) print $1}' |
+            sort -rn |
+            head -n1 |
+            awk '{print "3."$1}')
           echo "version=$LATEST_VERSION" >> $GITHUB_OUTPUT
 
       - name: Check if new version
